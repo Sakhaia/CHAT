@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <div id="login">
+        <h2>Login</h2>
+        <input type="text" id="login-username" placeholder="Username">
+        <input type="password" id="login-password" placeholder="Password">
+        <button onclick="login()">Login</button>
+
+        <!-- Добавлено поле для ввода сообщения и кнопка отправки -->
+        <div id="chat" style="display:none;">
+            <h2>Chat</h2>
+            <div id="chat-messages" style="height: 300px; overflow-y: scroll;"></div>
+            <input type="text" id="chat-message" placeholder="Type a message...">
+            <button onclick="sendChatMessage()">Send</button>
+        </div>
+    </div>
+    <script src="chat.js"></script>
+
+    <script>
+        const socket = new WebSocket("ws://localhost:8080");
+    
+        socket.onopen = function(e) {
+            console.log("Connection established!");
+        };
+    
+        socket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            if (data.action === "message") {
+                // Обработка полученного сообщения
+                const chatMessages = document.getElementById("chat-messages");
+                if (chatMessages) {
+                    chatMessages.innerHTML += `<div>${data.message}</div>`;
+                }
+            }
+        };
+    
+        function sendChatMessage() {
+            const messageInput = document.getElementById("chat-message");
+            const message = messageInput.value.trim(); // Убираем лишние пробелы в начале и в конце
+            if (message) {
+                const username = sessionStorage.getItem("username");
+                const fullMessage = username + ": " + message;
+                socket.send(JSON.stringify({ action: "message", message: fullMessage }));
+                messageInput.value = "";
+            }
+        }
+    </script>
+    
+</body>
+</html>

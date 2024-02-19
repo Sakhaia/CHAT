@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <div id="register">
+        <h2>Register</h2>
+        <input type="text" id="register-username" placeholder="Username">
+        <input type="password" id="register-password" placeholder="Password">
+        <button onclick="register()">Register</button>
+    </div>
+    <script src="chat.js"></script>
+
+    <script>
+        const socket = new WebSocket("ws://localhost:8080");
+    
+        socket.onopen = function(e) {
+            console.log("Connection established!");
+        };
+    
+        socket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            if (data.action === "message") {
+                // Обработка полученного сообщения
+                const chatMessages = document.getElementById("chat-messages");
+                if (chatMessages) {
+                    chatMessages.innerHTML += `<div>${data.message}</div>`;
+                }
+            }
+        };
+    
+        function register() {
+            const username = document.getElementById("register-username").value;
+            const password = document.getElementById("register-password").value;
+            socket.send(JSON.stringify({ action: "register", user: { username, password } }));
+            sessionStorage.setItem("username", username);
+        }
+    </script>
+    
+</body>
+</html>
