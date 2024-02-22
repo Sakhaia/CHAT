@@ -50,7 +50,7 @@ class ChatServer:
 
 async def main():
     chat_server = ChatServer()
-    start_server = await websockets.serve(chat_server.handle_message, "localhost", 8080)
+    start_server = await websockets.serve(chat_server.handle_message, "0.0.0.0", 8080)
 
     async with start_server:
         print("Server started. Listening for incoming connections...")
